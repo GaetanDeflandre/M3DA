@@ -231,8 +231,8 @@ void GLApplication::sectionCircle() {
 void GLApplication::pathDefault() {
 
     _path.clear();
-    _path.push_back(Vector3(0,0,-2));
-    _path.push_back(Vector3(0,0,2));
+    _path.push_back(Vector3(-2,0,-2));
+    _path.push_back(Vector3(2,0,2));
 
 
 }
@@ -324,6 +324,11 @@ void GLApplication::drawPathSpline() {
 Vector3 GLApplication::rotatePlane(const Vector3 &p,const Vector3 &n) {
     Vector3 result;
 
+    Quaternion q = Quaternion();
+
+    q.setRotation(Vector3(0,0,1), n);
+    result = q * p;
+
     return result;
 }
 
@@ -375,7 +380,7 @@ void GLApplication::extrudeLine() {
         for (unsigned int j=0; j<nbSlide; j++){
             double x = _section[j].x();
             double y = _section[j].y();
-            _extrusion.push_back(Vector3(x,y,z));
+            _extrusion.push_back(rotatePlane(Vector3(x,y,z), Vector3(0,0,z)));
         }
     }
 
