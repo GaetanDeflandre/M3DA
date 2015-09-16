@@ -380,7 +380,7 @@ void GLApplication::extrudeLine() {
         for (unsigned int j=0; j<nbSlide; j++){
             double x = _section[j].x();
             double y = _section[j].y();
-            _extrusion.push_back(_path[i] + rotatePlane(Vector3(_section[j], 0), Vector3(_path[i].x(),_path[i].y(),_path[i].z())));
+            _extrusion.push_back(_path[i] + rotatePlane(Vector3(_section[j], 0), _path[i+1] - _path[i-1]));
             //_extrusion.push_back(Vector3(x,y,z));
         }
     }
