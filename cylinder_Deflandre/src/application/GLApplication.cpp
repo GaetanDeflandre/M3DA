@@ -326,7 +326,7 @@ Vector3 GLApplication::rotatePlane(const Vector3 &p,const Vector3 &n) {
 
     Quaternion q = Quaternion();
 
-    q.setRotation(Vector3(0,0,1), n);
+    q.setRotation(Vector3(1,1,1), n);
     result = q * p;
 
     return result;

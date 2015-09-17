@@ -57,10 +57,10 @@ void Nurbs::knotUniform(EDirection direction,int nb) {
 double Nurbs::evalNkp(int k,int p,double u,std::vector<double> &knot) {
     double result=0.0;
     /* TODO : compute Nkp(u)
-   * - knot[i] : the knot i
-   * - p : degree
-   * - k : indice of the basis function.
-   */
+    * - knot[i] : the knot i
+    * - p : degree
+    * - k : indice of the basis function.
+    */
 
     if(p == 0){
 
@@ -124,11 +124,17 @@ void Nurbs::addControlU(const Vector4 &p) {
 Vector3 Nurbs::pointCurve(double u) {
     Vector4 result(0,0,0,0);
     /* TODO :
- * - compute P(t) in result. Use the direction D_U only (curve)
- * - control(i) : control points
- * - nbControl(D_U) : number of control points
- * - evalNkp(D_U,k,p,u) to eval basis function
- */
+    * - compute P(t) in result. Use the direction D_U only (curve)
+    * - control(i) : control points
+    * - nbControl(D_U) : number of control points
+    * - evalNkp(D_U,k,p,u) to eval basis function
+    */
+
+
+
+    //double Nkp = evalNkp(D_U,)
+
+
 
     return Vector3(result.x(),result.y(),result.z());
 }
@@ -137,12 +143,13 @@ Vector3 Nurbs::pointCurve(double u) {
 Vector3 Nurbs::pointSurface(double u,double v) {
     Vector4 result(0,0,0,0);
     /* TODO :
-   * - compute P(u,v) in result. Use direction D_U and D_V (surface)
-   * - control(i,j) : control points (i= indice in direction U, j=indice in direction V)
-   * - nbControl(D_U), nbControl(D_V) to know the number of control points in each direction.
-   * - degree(D_U), degree(D_V) to get the degree in each direction.
-   * - evalNkp(D_U or D_V,k,p,t) to eval basis function in each direction
-   */
+    * - compute P(u,v) in result. Use direction D_U and D_V (surface)
+    * - control(i,j) : control points (i= indice in direction U, j=indice in direction V)
+    * - nbControl(D_U), nbControl(D_V) to know the number of control points in each direction.
+    * - degree(D_U), degree(D_V) to get the degree in each direction.
+    * - evalNkp(D_U or D_V,k,p,t) to eval basis function in each direction
+    */
+
 
     return result.project(); // divide by w
 }

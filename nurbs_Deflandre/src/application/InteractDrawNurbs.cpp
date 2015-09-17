@@ -389,14 +389,16 @@ void InteractDrawNurbs::drawBasis()
             *
             */
 
-            double u = ;
-            double Nkp = _nurbs->evalNkp(direction,k,_nurbs->degree(direction),u);
-            toDraw.push_back(Vector3(u,Nkp,0));
+            double uBegin = _nurbs->knot(direction, k);
+            double uEnd = _nurbs->knot(direction, k + _nurbs->degree(direction)+1);
 
-            //cout << "point: " <<  nbBasis << endl;
+            for (int i=0; i<nbPoint; i++){
+                double u = ((double)i/(double)nbPoint) * (uEnd-uBegin) + uBegin;
+                double Nkp = _nurbs->evalNkp(direction,k,_nurbs->degree(direction),u);
+                toDraw.push_back(Vector3(u,Nkp,0));
+            }
 
             // end TODO
-
             // draw the resulting line strip :
             p3d::drawLineStrip(toDraw);
         }
