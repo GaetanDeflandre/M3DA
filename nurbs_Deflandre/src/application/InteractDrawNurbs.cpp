@@ -84,12 +84,24 @@ bool InteractDrawNurbs::computeCurve() {
     _draw.resize(_drawNbPts);
 
     /* TODO :
-   * - compute each drawing point of the curve in _draw (_drawNbPts is the number of points to set; _draw is a vector of Vector3)
-   * - _nurbs->startInterval(D_U) (resp. endInterval(D_U)) returns the start of value u (resp. end u).
-   * - loop on indices of _draw (size = _drawNbPts) and update u (pre compute the step)
-   *  - _nurbs->pointCurve(u) should give the point P(u)
-   */
+    * - compute each drawing point of the curve in _draw (_drawNbPts is the number of points to set; _draw is a vector of Vector3)
+    * - _nurbs->startInterval(D_U) (resp. endInterval(D_U)) returns the start of value u (resp. end u).
+    * - loop on indices of _draw (size = _drawNbPts) and update u (pre compute the step)
+    *  - _nurbs->pointCurve(u) should give the point P(u)
+    */
 
+    double start = _nurbs->startInterval(D_U);
+    double end   = _nurbs->endInterval(D_U);
+    double u = 0.0;
+
+    double step = (end - start) / (_drawNbPts - 1);
+    u = start;
+
+    for (unsigned i=0; i<_drawNbPts; i++){
+        //u = i / ((_drawNbPts)/(end-start));
+        _draw[i] = _nurbs->pointCurve(u);
+        u += step;
+    }
 
     _computeNurbsRequest=false;
     return true;

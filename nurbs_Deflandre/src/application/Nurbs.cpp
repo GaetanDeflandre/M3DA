@@ -130,11 +130,11 @@ Vector3 Nurbs::pointCurve(double u) {
     * - evalNkp(D_U,k,p,u) to eval basis function
     */
 
+    unsigned len = nbControl(D_U);
 
-
-    //double Nkp = evalNkp(D_U,)
-
-
+    for (unsigned i=0; i<=len; i++){
+        result += control(i) * evalNkp(D_U, i, degree(D_U), u);
+    }
 
     return Vector3(result.x(),result.y(),result.z());
 }
