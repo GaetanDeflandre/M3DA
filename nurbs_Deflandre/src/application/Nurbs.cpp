@@ -176,23 +176,49 @@ void Nurbs::knotOpenUniform(EDirection direction) {
     _knot[direction].resize(nbControl(direction)+degree(direction)+1);
 
 
-    /* TODO : the first and the last knots have a multiplicity of degree
-   *
-   *
-   *
-   *
-   */
+    /* TODO : the first and the last knots have a multiplicity of degree */
+
+    double size = _knot[direction].size();
+
+    // multiplicity
+    double m = degree(direction);
+    double step = 1 / (size-2*m+1);
+    double cpt = 1;
+
+    for(int i=0; i<size; i++) {
+        if(i<m){
+
+            _knot[direction][i] = 0.0;
+
+        } else if(i>=m && i<size-m) {
+
+            _knot[direction][i] = cpt*step;
+            cpt++;
+
+        } else {
+
+            _knot[direction][i] = 1.0;
+
+        }
+    }
 
 }
 
 
 void Nurbs::knotBezier(EDirection direction) {
 
-    /* TODO : define a bezier curve : degree = nbControl-1,
-   *
-   *
-   *
-   */
+    /* TODO : define a bezier curve : degree = nbControl-1, */
+
+    double size = _knot[direction].size();
+    degree(direction, nbControl(direction)-1);
+
+    for(double i=0.0; i<=size; i++) {
+        if(i<size/2)
+            _knot[direction][i] = 0.0;
+
+        else
+            _knot[direction][i] = 1.0;
+    }
 
 }
 

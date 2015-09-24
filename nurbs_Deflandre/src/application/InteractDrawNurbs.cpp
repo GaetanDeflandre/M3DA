@@ -92,15 +92,13 @@ bool InteractDrawNurbs::computeCurve() {
 
     double start = _nurbs->startInterval(D_U);
     double end   = _nurbs->endInterval(D_U);
-    double u = 0.0;
+    double u = start;
 
-    double step = (end - start) / (_drawNbPts - 1);
-    u = start;
 
     for (unsigned i=0; i<_drawNbPts; i++){
-        //u = i / ((_drawNbPts)/(end-start));
+        // Interpolation linéaire
+        u = ((i * (end-start)) / _drawNbPts) + start;
         _draw[i] = _nurbs->pointCurve(u);
-        u += step;
     }
 
     _computeNurbsRequest=false;
