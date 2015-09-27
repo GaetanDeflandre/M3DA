@@ -232,8 +232,8 @@ void GLApplication::pathDefault() {
 
     _path.clear();
     _path.push_back(Vector3(-2,0,-2));
-    _path.push_back(Vector3(2,0,2));
-
+    _path.push_back(Vector3(0,0,2));
+    _path.push_back(Vector3(2,0,-1));
 
 }
 
@@ -352,6 +352,16 @@ Vector3 GLApplication::tangentPathSpline(double tNormalized) {
 Vector3 GLApplication::tangentPathLine(unsigned int i) {
     Vector3 result;
 
+    // last index
+    unsigned last = _path.size() - 1;
+
+    if (i==0){
+        result = _path[1] - _path[0];
+    } else if (i==last){
+        result = _path[last] - _path[last-1];
+    } else {
+        result = _path[i+1] - _path[i-1];
+    }
 
     return result;
 }
@@ -375,19 +385,15 @@ void GLApplication::extrudeLine() {
     unsigned int nbStack = _path.size();
     unsigned int nbSlide = _section.size();
 
-    cout << "début extrude" << endl;
-
     for (unsigned int i=0; i<nbStack; i++){
         double z = _path[i].z();
         for (unsigned int j=0; j<nbSlide; j++){
             double x = _section[j].x();
             double y = _section[j].y();
             //_extrusion.push_back(Vector3(x,y,z));
-            _extrusion.push_back(_path[i] + rotatePlane(Vector3(_section[j], 0), _path[1] - _path[0]));
+            _extrusion.push_back(_path[i] + rotatePlane(Vector3(_section[j], 0), tangentPathLine(i)));
         }
     }
-
-    cout << "fin extrude" << endl;
 
 }
 
