@@ -326,7 +326,7 @@ Vector3 GLApplication::rotatePlane(const Vector3 &p,const Vector3 &n) {
 
     Quaternion q = Quaternion();
 
-    q.setRotation(Vector3(1,1,1), n);
+    q.setRotation(Vector3(0,0,1), n);
     result = q * p;
 
     return result;
@@ -375,15 +375,19 @@ void GLApplication::extrudeLine() {
     unsigned int nbStack = _path.size();
     unsigned int nbSlide = _section.size();
 
+    cout << "début extrude" << endl;
+
     for (unsigned int i=0; i<nbStack; i++){
         double z = _path[i].z();
         for (unsigned int j=0; j<nbSlide; j++){
             double x = _section[j].x();
             double y = _section[j].y();
-            _extrusion.push_back(_path[i] + rotatePlane(Vector3(_section[j], 0), _path[i+1] - _path[i-1]));
             //_extrusion.push_back(Vector3(x,y,z));
+            _extrusion.push_back(_path[i] + rotatePlane(Vector3(_section[j], 0), _path[1] - _path[0]));
         }
     }
+
+    cout << "fin extrude" << endl;
 
 }
 
