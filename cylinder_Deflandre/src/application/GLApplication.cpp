@@ -239,7 +239,18 @@ void GLApplication::pathDefault() {
 
 void GLApplication::pathCircle() {
 
+    _path.clear();
 
+    unsigned nbPoint = 20;
+    double step = (2*M_PI) / (double)nbPoint;
+
+    // Pour i allant de 0 à 2Pi
+    for(double i=0; i<2*M_PI; i+=step) {
+        _path.push_back(Vector3(cos(i), 0, sin(i)));
+    }
+
+    // refermer le cercle
+    _path.push_back(Vector3(cos(0), 0, sin(0)));
 }
 
 /** ************************************************************************ **/
@@ -358,6 +369,14 @@ Vector3 GLApplication::pointSpline(double tNormalized) {
 Vector3 GLApplication::tangentPathSpline(double tNormalized) {
     Vector3 result;
 
+    if(tNormalized == 0) {
+        return pointSpline(0.01) - pointSpline(0);
+    } else if(tNormalized == 1) {
+        return pointSpline(1) - pointSpline(0.99);
+    } else {
+        return pointSpline(tNormalized+0.01) - pointSpline(tNormalized-0.01);
+    }
+
     return result;
 }
 
@@ -416,6 +435,17 @@ void GLApplication::extrudeSpline() {
 
     _extrusion.clear();
     _normalExtrusion.clear(); // for lighting (last question)
+
+    unsigned int nbStack = 50;
+    unsigned int nbSlide = _section.size();
+
+    for (unsigned int i=0; i<nbStack; i++){
+        double tNormalized = (double) i / (double)(nbStack-1);
+        for (unsigned int j=0; j<nbSlide; j++){
+            //_extrusion.push_back(Vector3(x,y,z));
+            _extrusion.push_back(pointSpline(tNormalized) + rotatePlane(Vector3(_section[j], 0), tangentPathSpline(tNormalized)) * scale(tNormalized));
+        }
+    }
 }
 
 
@@ -423,7 +453,11 @@ void GLApplication::extrudeSpline() {
 
 
 double GLApplication::scale(double tNormalized) {
-    return 1.0;
+
+    vector<double> t = {0.0, 0.5, 1.0, 2.0};
+
+    return t[1] + 0.5 * tNormalized*(t[2] - t[0] + tNormalized*(2.0*t[0]
+            - 5.0*t[1] + 4.0*t[2] - t[3] + tNormalized*(3.0*(t[1] - t[2]) + t[3] - t[0])));
 
 }
 
@@ -440,7 +474,6 @@ void GLApplication::drawPath() {
         drawPathLine();
     }
     else if (_activePath==Path_Spline) {
-        cout << "bonjour" << endl;
         drawPathSpline();
     }
 }
