@@ -337,6 +337,20 @@ Vector3 GLApplication::rotatePlane(const Vector3 &p,const Vector3 &n) {
 Vector3 GLApplication::pointSpline(double tNormalized) {
     Vector3 result;
 
+    unsigned len = _path.size();
+    unsigned i = tNormalized * (len-1);
+    double t = tNormalized * (len-1) - i;
+
+
+    Vector3 P0 = _path[i];
+    Vector3 P1 = _path[i+1];
+    Vector3 T0 = tangentPathLine(i);
+    Vector3 T1 = tangentPathLine(i+1);
+
+    result = pow(t,3) *  (2.0*P0 -2.0*P1 + T0 + T1)
+            + pow(t,2) * (-3.0*P0 +3.0*P1 -2.0*T0 - T1)
+            + t*T0 + P0;
+
     return result;
 }
 
@@ -402,8 +416,6 @@ void GLApplication::extrudeSpline() {
 
     _extrusion.clear();
     _normalExtrusion.clear(); // for lighting (last question)
-
-
 }
 
 
@@ -428,6 +440,7 @@ void GLApplication::drawPath() {
         drawPathLine();
     }
     else if (_activePath==Path_Spline) {
+        cout << "bonjour" << endl;
         drawPathSpline();
     }
 }
@@ -467,8 +480,11 @@ void GLApplication::leftPanel(int i,const std::string &s) {
         _activeDraw=D_Section;
         break;
     case M_Spline_Line:
-        if (_activePath==Path_Line) _activePath=Path_Spline;
-        else _activePath=Path_Line;
+        if (_activePath==Path_Line){
+            _activePath=Path_Spline;
+        } else {
+            _activePath=Path_Line;
+        }
         if (_activeDraw==D_Extrusion) {
             buildExtrusion();
         }
