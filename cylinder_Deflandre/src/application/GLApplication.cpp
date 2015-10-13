@@ -7,6 +7,7 @@
 
 #include <iostream>
 #include <cmath>
+#include <unistd.h>
 
 /*!
 *
@@ -145,6 +146,7 @@ void GLApplication::draw() {
         }
     default:break;
     }
+
 }
 
 
@@ -282,17 +284,14 @@ void GLApplication::drawExtrusion() {
 
     drawGrid(_extrusion,nbSlice); // comment this when last question done
 
-    /*
-   *  uncomment once normals computed (last question)
-  p3d::lightPosition[0]=Vector4(0,0,10,1);
-  p3d::lightIntensity[0]=1.0;
-  p3d::material(Vector4(0,0,0.3,1),Vector3(0,0.2,0.8),Vector3(0,0.8,0.3),100);
-  p3d::diffuseBackColor=Vector3(0.8,0,0);
-  p3d::shaderLightPhong();
-  fillGrid(_extrusion,_normalExtrusion,nbSlice);
-  */
-
-
+    //*  uncomment once normals computed (last question)
+    p3d::lightPosition[0]=Vector4(0,0,10,1);
+    p3d::lightIntensity[0]=1.0;
+    p3d::material(Vector4(0,0,0.3,1),Vector3(0,0.2,0.8),Vector3(0,0.8,0.3),100);
+    p3d::diffuseBackColor=Vector3(0.8,0,0);
+    p3d::shaderLightPhong();
+    fillGrid(_extrusion,_normalExtrusion,nbSlice);
+    //*/
 
     drawPath();
 
@@ -401,10 +400,49 @@ Vector3 GLApplication::tangentPathLine(unsigned int i) {
 
 /** ************************************************************************* **/
 
+bool GLApplication::isZero(Vector2 v){
+    double absx = fabs(v.x());
+    double absy = fabs(v.y());
+
+    double epsilon = 0.0001;
+
+    if (absx>epsilon && absy>epsilon){
+        return true;
+    }
+
+    return false;
+}
+
+
 void GLApplication::normalSection() {
+
+    unsigned secLen = _section.size();
+
     _normalSection.clear();
+    _normalSection.resize(secLen, Vector2(0,0));
+
+    for(unsigned i=0; i<secLen; i++){
+
+        double dx = _section[(i+1) % secLen].x() - _section[i].x();
+        double dy = _section[(i+1) % secLen].y() - _section[i].y();
 
 
+        if ( isZero(_normalSection.at(i)) ){
+            _normalSection.at(i) = Vector2(-dy, dx);
+        } else {
+            // Moyenne
+            _normalSection.at(i) += Vector2(-dy, dx);
+            _normalSection.at(i) = _normalSection.at(i) / 2;
+        }
+
+        if ( isZero(_normalSection.at((i+1) % secLen)) ){
+            _normalSection.at((i+1) % secLen) = Vector2(dy, -dx);
+        } else {
+            // Moyenne
+            _normalSection.at((i+1) % secLen) += Vector2(dy, -dx);
+            _normalSection.at((i+1) % secLen) = _normalSection.at((i+1) % secLen) / 2;
+        }
+    }
 }
 
 
@@ -414,20 +452,21 @@ void GLApplication::extrudeLine() {
     _extrusion.clear();
     _normalExtrusion.clear(); // for lighting (last question)
 
+    normalSection();
 
-    unsigned int nbStack = _path.size();
-    unsigned int nbSlide = _section.size();
+    unsigned nbStack = _path.size();
+    unsigned nbSlide = _section.size();
 
-    for (unsigned int i=0; i<nbStack; i++){
+    for (unsigned i=0; i<nbStack; i++){
         double z = _path[i].z();
-        for (unsigned int j=0; j<nbSlide; j++){
+        for (unsigned j=0; j<nbSlide; j++){
             double x = _section[j].x();
             double y = _section[j].y();
             //_extrusion.push_back(Vector3(x,y,z));
+            _normalExtrusion.push_back(Vector3(_normalSection[j], 0));
             _extrusion.push_back(_path[i] + rotatePlane(Vector3(_section[j], 0), tangentPathLine(i)));
         }
     }
-
 }
 
 void GLApplication::extrudeSpline() {
@@ -436,13 +475,17 @@ void GLApplication::extrudeSpline() {
     _extrusion.clear();
     _normalExtrusion.clear(); // for lighting (last question)
 
-    unsigned int nbStack = 50;
-    unsigned int nbSlide = _section.size();
+    normalSection();
 
-    for (unsigned int i=0; i<nbStack; i++){
-        double tNormalized = (double) i / (double)(nbStack-1);
-        for (unsigned int j=0; j<nbSlide; j++){
+    double nbStack = 100.0;
+    unsigned nbSlide = _section.size();
+
+    for (unsigned i=0; i<nbStack; i++){
+        double tNormalized = (double)i / nbStack;
+        for (unsigned j=0; j<nbSlide; j++){
             //_extrusion.push_back(Vector3(x,y,z));
+            cout << _normalSection[j] << endl;
+            _normalExtrusion.push_back(Vector3(_normalSection[j], 0));
             _extrusion.push_back(pointSpline(tNormalized) + rotatePlane(Vector3(_section[j], 0), tangentPathSpline(tNormalized)) * scale(tNormalized));
         }
     }

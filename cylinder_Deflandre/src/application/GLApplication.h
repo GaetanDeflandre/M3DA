@@ -46,6 +46,7 @@ public:
   void sectionSquare();
   void sectionCircle();
   void normalSection();
+  bool isZero(p3d::Vector2 v);
 
   void pathDefault();
   void pathCircle();
