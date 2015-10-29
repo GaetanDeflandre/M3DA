@@ -1,7 +1,14 @@
-Nom1 Prénom1
-Nom2 Prénom2
+TP3: Subdivision
+================
 
-Doit contenir :
-- ce que vous n'avez pas fait (et pourquoi).
-- difficultés rencontrées.
-- commentaires éventuels sur le TP (points à éclaircir, longueur du sujet, etc). 
+
+## Auteur
+
+- Gaëtan DEFLANDRE
+
+
+## Détails
+
+- Le TP est terminé.
+- Retrouver les faces du nouveau mesh subdivisé n'est pas facile.
+- Cette étape n'est pas détailée dans le cours.
