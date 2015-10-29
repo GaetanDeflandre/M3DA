@@ -1,7 +1,13 @@
-Nom1 Prénom1
-Nom2 Prénom2
+TP4: Introduction à la multirésolution (reverse Chaikin)
+========================================================
 
-Doit contenir :
-- ce que vous n'avez pas fait (et pourquoi).
-- difficultés rencontrées.
-- commentaires éventuels sur le TP (points à éclaircir, longueur du sujet, etc). 
+
+## Auteur
+
+- Gaëtan Deflandre
+
+
+## Détails
+
+- Ce TP est totalement terminé.
+- Le TP n'a pas été difficile, j'ai rencontré plus de problèmes de cast.

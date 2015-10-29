@@ -122,10 +122,20 @@ void MultiCurve::synthesisStep() {
    * use _currentCurve (contains the points of the current level) and _detail[level] (the detail coefficients).
    */
 
-    unsigned len = pow(2.0, (double)level+);
+    unsigned len = pow(2.0, level+1);
 
-    for (unsigned j=1; j<len;j++){
+    for (unsigned j=0; j<len; j+=2){
 
+        Vector3 P1, Q1, P2, Q2;
+
+        P1 = (3*_currentCurve[(n+j/2 - 1)%n] + _currentCurve[j/2]) / 4.0;
+        Q1 = (3*_detail[level][(n+j/2 - 1)%n] -_detail[level][j/2]) / 4.0;
+
+        P2 = (_currentCurve[(n+j/2 - 1)%n] + 3*_currentCurve[j/2]) / 4.0;
+        Q2 = (_detail[level][(n+j/2 - 1)%n] -3*_detail[level][j/2]) / 4.0;
+
+        finer.push_back(P1 + Q1);
+        finer.push_back(P2 + Q2);
     }
 
     /* end TODO
