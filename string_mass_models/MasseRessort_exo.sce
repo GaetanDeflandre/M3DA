@@ -34,19 +34,25 @@ k_t=0;
 // vecteur des positions:
 X_t = zeros(2*numNoeuds,1);
 
+// vitesse fonction de position et T
+vitesse = zeros(numNoeuds,2);
+
 for i=1:numNoeuds
      X_t([2*i-1 2*i]) = [noeuds(1,i) ; noeuds(2,i)];
 end
 
-
+// gravité selon y
+acceleration = [0, -(g*dt)];
 
 for time=0:dt:T,
 
-    
+    vitesse(:,1) = vitesse(:,1) + acceleration(1);
+    vitesse(:,2) = vitesse(:,2) + acceleration(2);
 
     // mouvement de translation uniforme
     for i=1:numNoeuds
-        X_t([2*i]) = X_t([2*i]) +0.2;
+        X_t([2*i-1]) = X_t([2*i-1]) + vitesse(i,1);
+        X_t([2*i]) = X_t([2*i]) + vitesse(i,2);
     end
     
     
@@ -76,14 +82,3 @@ for time=0:dt:T,
 
 
 end
-
-  
-  
-  
-  
-
-  
-
-
-
-
