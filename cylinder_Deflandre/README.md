@@ -8,6 +8,8 @@ TP1: Cylindre Généralisé
 
 ## Détails
 
+- ce que vous n'avez pas fait (et pourquoi).
+  - la partie sur les normales ne fonctionne pas.
 - difficultés rencontrées.
   - calcul de la normale
 
