@@ -10,24 +10,21 @@ global segments;
 global L0;
 global _MYDATA_;
 
-// etat courant
-// historique
-F_t = zeros(2*numNoeuds,1);
-V_t = zeros(2*numNoeuds,1);
-X_t = zeros(2*numNoeuds,1);
 
 function [value] = Fnl(dV)
     
-
     numNoeuds = size(noeuds,2);  
     
     F_t = zeros(2*numNoeuds,1);
     
+    dV = dV .* blocked;
+    
     // reecrire les equations de newton en implicite
-    F_t = m* dV /dt - m*g - Fk(_MYDATA_.X_t + (_MYDATA_.V_t + dV) * dt);
+    F_t = m* dV /dt - m*G - Fk(_MYDATA_.X_t + (_MYDATA_.V_t + dV) * dt);
+    
+    F_t = F_t .* blocked;
     
     value = F_t;
-    
     
 endfunction
 
@@ -35,7 +32,7 @@ endfunction
 function [value] = Fk(position)
     
     // mise à zero des forces
-    Fk = zeros(2*numNoeuds,1);
+    Fk_t = zeros(2*numNoeuds,1);
     
     L=[];
     for s=1:numSegments,
@@ -51,12 +48,12 @@ function [value] = Fk(position)
         F = n*(k*(L(s) - _MYDATA_.L0(s)))// + d*V)
         
         // ajout de la force dans le vecteur
-        Fk([2*i1-1 2*i1]) = F_t([2*i1-1 2*i1])  - F;
-        Fk([2*i2-1 2*i2]) = F_t([2*i2-1 2*i2])  + F;
+        Fk_t([2*i1-1 2*i1]) = Fk_t([2*i1-1 2*i1])  - F;
+        Fk_t([2*i2-1 2*i2]) = Fk_t([2*i2-1 2*i2])  + F;
         
     end
     
-    value = Fk
+    value = Fk_t;
     
 endfunction
 
@@ -67,13 +64,12 @@ endfunction
 
 
 // parametres physiques
-k=1000;
+k=5000;
 m=1;
 g=9.81;
 // parametres temps
 dt = 0.1;
-T =  1.0;
-
+T =  2.0;
 
 
 numElements = size(elements,2);
@@ -84,12 +80,25 @@ segments = findSegments(elements)
 numSegments = size(segments,2);
 
 
+// etat courant
+// historique
+F_t = zeros(2*numNoeuds,1);
+V_t = zeros(2*numNoeuds,1);
+X_t = zeros(2*numNoeuds,1);
+
 
 for i=1:numNoeuds
      X_t([2*i-1 2*i]) = [noeuds(1,i) ; noeuds(2,i)];
 end
 _MYDATA_.V_t = V_t;
 _MYDATA_.X_t = X_t;
+
+
+G = zeros(2*numNoeuds,1);
+for i=1:numNoeuds,
+    G(i*2) = -g;
+end
+
 
 // longueurs au repos
 L0=[];
@@ -100,6 +109,17 @@ for s=1:numSegments,
 end
 
 _MYDATA_.L0 = L0;
+
+
+// les points bloquer
+blocked = ones(2*numNoeuds,1);
+for i=1:numNoeuds
+    if i<6 then
+        blocked(2*i - 1) = 0;
+        blocked(2*i) = 0;
+    end
+end
+
 
 // gif de sortie
 S = [];
@@ -140,7 +160,7 @@ for time=0:dt:T,
     k_t=k_t+1;
     
     S(2) = string(k_t+99);
-    xs2bmp(0,strcat(S));
+    xs2gif(0,strcat(S));
     xpause(100);
 
 
