@@ -10,6 +10,12 @@ global segments;
 global L0;
 global _MYDATA_;
 
+// etat courant
+// historique
+F_t = zeros(2*numNoeuds,1);
+V_t = zeros(2*numNoeuds,1);
+X_t = zeros(2*numNoeuds,1);
+
 function [value] = Fnl(dV)
     
 
@@ -18,13 +24,41 @@ function [value] = Fnl(dV)
     F_t = zeros(2*numNoeuds,1);
     
     // reecrire les equations de newton en implicite
-
+    F_t = m* dV /dt - m*g - Fk(_MYDATA_.X_t + (_MYDATA_.V_t + dV) * dt);
     
     value = F_t;
     
     
 endfunction
 
+
+function [value] = Fk(position)
+    
+    // mise à zero des forces
+    Fk = zeros(2*numNoeuds,1);
+    
+    L=[];
+    for s=1:numSegments,
+        i1= segments(1,s);
+        i2= segments(2,s);
+        // longueur actuelle
+        L(s) = norm(position([2*i1-1 2*i1]) - position([2*i2-1 2*i2]) )
+        // normale actuelle
+        n = (position([2*i1-1 2*i1]) - position([2*i2-1 2*i2]))*(1.0/L(s));
+        // vitesse relative actuelle
+        // V = n' * (V_t([2*i1-1 2*i1]) - V_t([2*i2-1 2*i2]))
+        // force du ressort
+        F = n*(k*(L(s) - _MYDATA_.L0(s)))// + d*V)
+        
+        // ajout de la force dans le vecteur
+        Fk([2*i1-1 2*i1]) = F_t([2*i1-1 2*i1])  - F;
+        Fk([2*i2-1 2*i2]) = F_t([2*i2-1 2*i2])  + F;
+        
+    end
+    
+    value = Fk
+    
+endfunction
 
 
 
@@ -46,20 +80,8 @@ numElements = size(elements,2);
 numNoeuds = size(noeuds,2);     
 
 
-
-
 segments = findSegments(elements)
 numSegments = size(segments,2);
-
-
-
-
-// etat courant
-// historique
-F_t = zeros(2*numNoeuds,1);
-A = zeros(2*numNoeuds,1);
-V_t = zeros(2*numNoeuds,1);
-X_t = zeros(2*numNoeuds,1);
 
 
 
@@ -77,6 +99,7 @@ for s=1:numSegments,
     L0(s) = norm( X_t([2*i1-1 2*i1]) - X_t([2*i2-1 2*i2]) )
 end
 
+_MYDATA_.L0 = L0;
 
 // gif de sortie
 S = [];
@@ -90,7 +113,7 @@ dV = zeros(2*numNoeuds,1);
 for time=0:dt:T,
 
     // Euler implicite 
-    V_t = V_t + dV;    
+    V_t = V_t + dV;
     X_t = X_t + V_t*dt;
     _MYDATA_.V_t = V_t;
     _MYDATA_.X_t = X_t;
